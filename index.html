@@ -1,8 +1,151 @@
-<style type="text/css">
- <!--
- body {
-  background-image: url("images/raccoon.jpg");
-  background-repeat: no-repeat;
- }
- -->
-</style>
+ <!DOCTYPE html>
+<html>
+<body>
+
+<p>--- SwACC ---
+
+enable
+configure terminal
+no ip domain-lookup
+hostname SwAcc1
+no cdp run
+service password-encryption
+enable secret ciscosecpa55
+enable password ciscoenapa55
+line console 0
+password ciscoconpa55
+login
+loggin synchronous
+exec-timeout 25 25
+exit
+vty 0 15
+password ciscovtypa55
+login
+logging synchronous
+exec-timeout 25 25
+end
+clock set 15:30:24 07 Jul 2022
+conf t
+ip domain-name cti.ro
+crypto key generate rsa
+username Admin01 privilege 15 password Admin01pa55
+line vty 0 15
+transport input ssh
+login local
+exit
+
+VLANS
+vlan 20
+name NAMIBIA1
+exit
+... pt fiecare + MAN si NULL
+(pt vlan 20)
+interface range fa0/1-4
+switchport mode access
+switchport access vlan 20
+switchport port-security
+switchport port-security maximum 2
+switchport port-security mac-address sticky
+switchport port-security violation shutdown
+spanning-tree bpduguard enable
+spanning-tree portfast
+exit
+....
+interface range giga0/1-2, fa0/5-6,fa0/11-19
+switchport mode access
+switchport access vlan 31 (NULL)
+switchport port-security
+switchport port-security maximum 2
+switchport port-security mac-address sticky
+switchport port-security violation shutdown
+exit
+
+
+(pt MAN)
+interface range fa0/20-24
+switchport mode trunk
+switchport trunk native vlan 24
+switchport trunk allowed vlan 20,22,24
+exit
+
+interface vlan 24
+ip address (DEFAULT GATEWAY) (MASCA SWITCH)
+no shutdown
+
+ip default-gateway (IP SWITCH)
+spanning-tree mode rapid-pvst
+spanning-tree bpduguard enable
+
+
+--- SWD1/SwCore ---
+interface range fa0/20-24
+(comenzi man)
+
+interface range giga0/1-2,fa0/1-19
+switchport mode access
+switchport access vlan 31 (NULL)
+switchport port-security
+switchport port-security maximum 2
+switchport port-security mac-address sticky
+switchport port-security violation shutdown
+
+spanning-tree mode rapid-pvst
+
+ip default-gateway (DEFAULT GATEWAY)
+interface vlan 24
+ip address (IP SWITCH) (MASCA SWITCH)
+
+
+--- Router ---
+enable
+configure terminal
+hostname RVLAN
+no cdp run
+service password-encryption
+security passwords min-lenght 10
+login block-for 45 attempts 2 within 10
+enable secret ciscosecpa55
+enable password ciscoenapa55
+line console 0
+password ciscoconpa55
+login
+logging synchronous
+exec-timeout 25 25
+exit
+line vty 0 15
+password ciscovtypa55
+login logging synchronous
+exec-timeout 25 25
+end
+clock set 15:32:32 07 Jul 2022
+ip domain-name cti.ro
+crypto key generate rsa
+username Admin01 privilege 15 password Admin01pa55
+line vty 0 15
+transport input ssh
+login local exit
+
+interface giga0/0.20
+encapsulation dot1q 20
+ip address (DEFAULT GATEWAY VLAN/primul IP din range) (MASCA VLAN)
+exit
+(... pentru fiecare vlan)
+
+interface giga0/0
+ip address (IP ROUTER) (MASCA ROUTER)
+no shutdown
+exit
+
+interface serial0/0/0 
+ip address (IP legatura R - LAN) (MASCA)
+no shutdown
+exit
+(... pentru fiecare legatura)
+
+copy running-config startup-config
+
+router eigrp 1
+network (NA si ip-uri cu device-uri direct conectate/vlan-uri).</p>
+
+</body>
+</html> 
